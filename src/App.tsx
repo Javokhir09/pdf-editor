@@ -1,7 +1,18 @@
+import { EditorContent, useEditor } from "@tiptap/react"
+import StarterKit from "@tiptap/starter-kit"
+import { useState } from "react"
+
 function App() {
+  const [content, setContent] = useState<string>("")
+
+  const editor = useEditor({
+    extensions: [StarterKit],
+    content: content
+  })
+
   return (
     <>
-      <h1>Hello world</h1>
+      <EditorContent editor={editor} placeholder="Write here..." />
     </>
   )
 }
