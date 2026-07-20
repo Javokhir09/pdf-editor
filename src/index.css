@@ -1,1 +1,16 @@
 @import "tailwindcss";
+
+.ProseMirror {
+  min-height: 100%;
+  outline: none;
+  border: 1px solid #00000030;
+  padding: 8px;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: #9599a0;
+  pointer-events: none;
+  float: left;
+  height: 0;
+}
