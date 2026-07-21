@@ -3,15 +3,20 @@ import StarterKit from "@tiptap/starter-kit";
 import ToggleButton from "./ToggleButton";
 import Placeholder from "@tiptap/extension-placeholder";
 import Button from "./Button";
-import { ItalicIcon, MinusIcon, PlusIcon } from "lucide-react";
+import { DownloadIcon, ItalicIcon, MinusIcon, PlusIcon } from "lucide-react";
 import { useState } from "react";
+import { Color, TextStyle } from "@tiptap/extension-text-style";
+import html2pdf from 'html2pdf.js'
 
 function Editor() {
+  const colors = ['black', 'red', 'green', 'orange', 'blue', 'pink', 'magenta']
   const [fontSize, setFontSize] = useState<number>(16);
 
   const editor = useEditor({
     extensions: [
       StarterKit,
+      TextStyle,
+      Color,
       Placeholder.configure({ placeholder: "Write here..." }),
     ],
   });
@@ -26,6 +31,22 @@ function Editor() {
   })
 
   if (!editor) return null;
+
+
+  const exportToPDF = () => {
+    const content = document.querySelector<HTMLElement>('.ProseMirror') // Tiptap's content div
+    if (!content) return
+
+    html2pdf()
+      .set({
+        margin: 10,
+        filename: 'document.pdf',
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      })
+      .from(content)
+      .save()
+  }
 
   return (
     <div className="w-full flex items-center flex-col gap-2 p-2">
@@ -51,7 +72,9 @@ function Editor() {
         >
           U
         </ToggleButton>
+
         <div className="bg-black/40 w-px h-8"></div>
+
         <Button className="flex justify-center items-center" onClick={() => setFontSize(fontSize+1)}>
           <PlusIcon size={18} />
         </Button>
@@ -67,6 +90,23 @@ function Editor() {
         <Button className="flex justify-center items-center" onClick={() => setFontSize(fontSize-1)}>
           <MinusIcon size={18} />
         </Button>
+
+        <div className="bg-black/40 w-px h-8"></div>
+
+        <div className="flex gap-1 items-center">
+          {colors.map((color) => (
+            <button
+              key={color}
+              className="size-6 rounded-full cursor-pointer"
+              style={{ backgroundColor: color }}
+              onClick={() => editor.chain().focus().setColor(color).run()}
+            />
+          ))}
+        </div>
+
+        <div className="bg-black/40 w-px h-8"></div>
+
+        <Button onClick={() => exportToPDF()} className="w-fit flex items-center px-2 gap-2">Export <DownloadIcon size={18} /></Button>
       </div>
 
       <EditorContent
