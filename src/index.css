@@ -14,3 +14,16 @@
   float: left;
   height: 0;
 }
+
+/* Chrome, Safari, Edge, Opera */
+#font-size::-webkit-outer-spin-button,
+#font-size::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+#font-size {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}

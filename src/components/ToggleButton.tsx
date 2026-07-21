@@ -1,15 +1,15 @@
-import { useState, type ButtonHTMLAttributes } from "react"
+import type { ButtonHTMLAttributes } from "react"
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {}
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  pressed?: boolean
+}
 
-function ToggleButton({ children, className = "", ...props }: ButtonProps) {
-  const [toggled, setToggled] = useState<boolean>(false)
-
+function ToggleButton({ children, className = "", pressed = false, ...props }: ButtonProps) {
   return (
-    <button 
+    <button
       {...props}
-      className={`border border-black/40 size-8 cursor-pointer text-lg ${toggled ? "bg-gray-200/80" : ""} ${className}`} 
-      onClick={(e) => {setToggled((prev) => !prev); props.onClick?.(e)}} 
+      aria-pressed={pressed}
+      className={`border border-black/40 size-8 cursor-pointer text-lg ${pressed ? "bg-gray-200/80" : ""} ${className}`}
     >
       {children}
     </button>
