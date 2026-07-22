@@ -7,15 +7,17 @@ import { DownloadIcon, ItalicIcon, MinusIcon, PlusIcon } from "lucide-react";
 import { useState } from "react";
 import { Color, TextStyle } from "@tiptap/extension-text-style";
 import html2pdf from 'html2pdf.js'
+import { FontSize } from "../extensions/FontSize";
 
 function Editor() {
   const colors = ['black', 'red', 'green', 'orange', 'blue', 'pink', 'magenta']
-  const [fontSize, setFontSize] = useState<number>(16);
+  // const [fontSize, setFontSize] = useState<number>(16);
 
   const editor = useEditor({
     extensions: [
       StarterKit,
       TextStyle,
+      FontSize,
       Color,
       Placeholder.configure({ placeholder: "Write here..." }),
     ],
@@ -27,8 +29,13 @@ function Editor() {
       isBold: ctx.editor.isActive('bold'),
       isItalic: ctx.editor.isActive('italic'),
       isUnderline: ctx.editor.isActive('underline'),
+      fontSize: ctx.editor.getAttributes('textStyle').fontSize ?? '16',
     })
   })
+
+  const setFontSize = (size: string) => {
+    editor.chain().focus().setMark('textStyle', { fontSize: size }).run()
+  }
 
   if (!editor) return null;
 
@@ -75,21 +82,21 @@ function Editor() {
 
         <div className="bg-black/40 w-px h-8"></div>
 
-        <Button className="flex justify-center items-center" onClick={() => setFontSize(fontSize+1)}>
+        <select
+          value={editorState?.fontSize ?? '16'}
+          onChange={(e) => setFontSize(e.target.value)}
+          className="border border-black/40 h-8 cursor-pointer"
+        >
+          {[10, 12, 14, 16, 18, 20, 24, 28, 32, 40].map((size) => (
+            <option key={size} value={size}>{size}</option>
+          ))}
+        </select>
+        {/* <Button className="flex justify-center items-center" onClick={() => setFontSize(fontSize+1)}>
           <PlusIcon size={18} />
         </Button>
-        <input
-          type="number"
-          id="font-size"
-          name="font-size"
-          className="w-8 text-center border border-black/40 outline-none"
-          min={1}
-          max={96}
-          value={fontSize}
-        />
         <Button className="flex justify-center items-center" onClick={() => setFontSize(fontSize-1)}>
           <MinusIcon size={18} />
-        </Button>
+        </Button> */}
 
         <div className="bg-black/40 w-px h-8"></div>
 
@@ -108,12 +115,14 @@ function Editor() {
 
         <Button onClick={() => exportToPDF()} className="w-fit flex items-center px-2 gap-2">Export <DownloadIcon size={18} /></Button>
       </div>
-
-      <EditorContent
-        editor={editor}
-        className={`w-1/2 text-[${fontSize}px]`}
-        style={{ fontSize: `${fontSize}px` }}
-      />
+      
+      <div className="w-1/2 border border-black/40">
+        <EditorContent
+          editor={editor}
+          className={`w-full`}
+          // style={{ fontSize: `${fontSize}px` }}
+        />
+      </div>
     </div>
   );
 }
