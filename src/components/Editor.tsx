@@ -5,18 +5,16 @@ import Placeholder from "@tiptap/extension-placeholder";
 import Button from "./Button";
 import { DownloadIcon, ItalicIcon, MinusIcon, PlusIcon } from "lucide-react";
 import { useState } from "react";
-import { Color, TextStyle } from "@tiptap/extension-text-style";
+import { Color } from "@tiptap/extension-text-style";
 import html2pdf from 'html2pdf.js'
 import { FontSize } from "../extensions/FontSize";
 
 function Editor() {
   const colors = ['black', 'red', 'green', 'orange', 'blue', 'pink', 'magenta']
-  // const [fontSize, setFontSize] = useState<number>(16);
 
   const editor = useEditor({
     extensions: [
       StarterKit,
-      TextStyle,
       FontSize,
       Color,
       Placeholder.configure({ placeholder: "Write here..." }),
@@ -33,15 +31,28 @@ function Editor() {
     })
   })
 
-  const setFontSize = (size: string) => {
-    editor.chain().focus().setMark('textStyle', { fontSize: size }).run()
+  const setFontSize = (size: number) => {
+    const clamped = Math.min(Math.max(size, 1), 200)
+    editor.chain().focus().setMark('textStyle', { fontSize: String(clamped) }).run()
+  }
+
+  const currentFontSize = Number(editorState?.fontSize ?? 16)
+
+  const increaseFontSize = () => {
+    const newSize = currentFontSize + 1
+    editor.chain().focus().setMark('textStyle', { fontSize: String(newSize) }).run()
+  }
+
+  const decreaseFontSize = () => {
+    const newSize = Math.max(currentFontSize - 1, 1)
+    editor.chain().focus().setMark('textStyle', { fontSize: String(newSize) }).run()
   }
 
   if (!editor) return null;
 
 
   const exportToPDF = () => {
-    const content = document.querySelector<HTMLElement>('.ProseMirror') // Tiptap's content div
+    const content = document.querySelector<HTMLElement>('.ProseMirror')
     if (!content) return
 
     html2pdf()
@@ -82,21 +93,21 @@ function Editor() {
 
         <div className="bg-black/40 w-px h-8"></div>
 
-        <select
-          value={editorState?.fontSize ?? '16'}
-          onChange={(e) => setFontSize(e.target.value)}
-          className="border border-black/40 h-8 cursor-pointer"
-        >
-          {[10, 12, 14, 16, 18, 20, 24, 28, 32, 40].map((size) => (
-            <option key={size} value={size}>{size}</option>
-          ))}
-        </select>
-        {/* <Button className="flex justify-center items-center" onClick={() => setFontSize(fontSize+1)}>
+        <Button className="flex justify-center items-center" onClick={increaseFontSize}>
           <PlusIcon size={18} />
         </Button>
-        <Button className="flex justify-center items-center" onClick={() => setFontSize(fontSize-1)}>
+        <input
+          type="number"
+          id="font-size"
+          value={currentFontSize}
+          onChange={(e) => setFontSize(Number(e.target.value))}
+          className="border border-black/40 h-8 w-10 text-center"
+          min={1}
+          max={200}
+        />
+        <Button className="flex justify-center items-center" onClick={decreaseFontSize}>
           <MinusIcon size={18} />
-        </Button> */}
+        </Button>
 
         <div className="bg-black/40 w-px h-8"></div>
 
@@ -120,7 +131,6 @@ function Editor() {
         <EditorContent
           editor={editor}
           className={`w-full`}
-          // style={{ fontSize: `${fontSize}px` }}
         />
       </div>
     </div>
