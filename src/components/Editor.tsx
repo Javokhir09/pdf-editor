@@ -4,7 +4,7 @@ import ToggleButton from "./ToggleButton";
 import Placeholder from "@tiptap/extension-placeholder";
 import Button from "./Button";
 import { DownloadIcon, ItalicIcon, MinusIcon, PlusIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Color } from "@tiptap/extension-text-style";
 import html2pdf from 'html2pdf.js'
 import { FontSize } from "../extensions/FontSize";
@@ -37,6 +37,10 @@ function Editor() {
   }
 
   const currentFontSize = Number(editorState?.fontSize ?? 16)
+  const [inputValue, setInputValue] = useState(String(currentFontSize))
+  useEffect(() => {
+    setInputValue(String(currentFontSize))
+  }, [currentFontSize])
 
   const increaseFontSize = () => {
     const newSize = currentFontSize + 1
@@ -49,7 +53,6 @@ function Editor() {
   }
 
   if (!editor) return null;
-
 
   const exportToPDF = () => {
     const content = document.querySelector<HTMLElement>('.ProseMirror')
@@ -99,8 +102,16 @@ function Editor() {
         <input
           type="number"
           id="font-size"
-          value={currentFontSize}
-          onChange={(e) => setFontSize(Number(e.target.value))}
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onBlur={() => {
+            const num = Number(inputValue)
+            if (!isNaN(num) && num > 0) setFontSize(num)
+            else setInputValue(String(currentFontSize))
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") e.currentTarget.blur()
+          }}
           className="border border-black/40 h-8 w-10 text-center"
           min={1}
           max={200}
