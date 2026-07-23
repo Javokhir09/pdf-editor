@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { Color } from "@tiptap/extension-text-style";
 import html2pdf from 'html2pdf.js'
 import { FontSize } from "../extensions/FontSize";
+import { CaretSize } from "../extensions/CaretSize";
 
 function Editor() {
   const colors = ['black', 'red', 'green', 'orange', 'blue', 'pink', 'magenta']
@@ -17,7 +18,7 @@ function Editor() {
       StarterKit,
       FontSize,
       Color,
-      Placeholder.configure({ placeholder: "Write here..." }),
+      CaretSize,
     ],
   });
 
